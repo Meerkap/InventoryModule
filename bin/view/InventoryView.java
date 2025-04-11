@@ -6,14 +6,17 @@ import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
 import me.meerkap.rpgmarketplace.bin.module.InventoryModel;
 import me.meerkap.rpgmarketplace.bin.states.InventoryStateContext;
 
+import java.util.logging.Logger;
+
 /**
  * Vista principal del inventario (por ejemplo, la tienda).
  */
 public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
     private final String playerName;
     private int currentPage = 1;
-    private InventoryStateContext stateContext;
-    private HistoryComponent historyComponent;
+    private final InventoryStateContext stateContext;
+    private final HistoryComponent historyComponent;
+    private static final Logger LOGGER = Logger.getLogger(InventoryView.class.getName());
 
     public InventoryView(String playerName, InventoryModel model) {
         super(model);
@@ -25,21 +28,21 @@ public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
 
     @Override
     public void open() {
-        System.out.println("Abriendo inventario para " + playerName);
+        LOGGER.info("Abriendo inventario para " + playerName);
         stateContext.open();
         refresh();
     }
 
     @Override
     public void close() {
-        System.out.println("Cerrando inventario para " + playerName);
+        LOGGER.info("Cerrando inventario para " + playerName);
         stateContext.close();
         ViewRegistry.unregisterView(model.getUniqueId(), this);
     }
 
     @Override
     public void refresh() {
-        System.out.println("Actualizando vista de " + playerName + " en la página " + currentPage);
+        LOGGER.info("Actualizando vista de " + playerName + " en la página " + currentPage);
         // Aquí se integraría la lógica de renderizado real, por ejemplo, mostrando model.getPage(currentPage).
     }
 
@@ -62,7 +65,7 @@ public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
                 break;
             case BUY_ITEM:
                 historyComponent.registrarAccion(model, currentPage);
-                System.out.println("Iniciando compra, se cerrará esta vista.");
+                LOGGER.info("Iniciando compra; se cerrará la vista actual.");
                 close();
                 // La apertura de la vista de confirmación se delega al controlador.
                 break;
@@ -71,7 +74,7 @@ public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
                 close();
                 break;
             default:
-                System.out.println("Acción no reconocida: " + action);
+                LOGGER.warning("Acción no reconocida: " + action);
                 break;
         }
     }
@@ -89,7 +92,7 @@ public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
             this.model = previous.getModel();
             this.currentPage = previous.getPage();
             ViewRegistry.registerView(model.getUniqueId(), this);
-            System.out.println("Volviendo al inventario anterior para " + playerName);
+            LOGGER.info("Volviendo al inventario anterior para " + playerName);
             open();
         }
     }

@@ -16,13 +16,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Representa un inventario paginado.
  */
 public class PaginatedModel extends InventoryModel {
-    private final CopyOnWriteArrayList<ItemStack> allItems;
+    private final List<ItemStack> allItems;
     private final int itemsPerPage;
-    private transient Map<Integer, List<Object>> pageCache = new ConcurrentHashMap<>();
+    private final transient Map<Integer, List<Object>> pageCache = new ConcurrentHashMap<>();
 
     public PaginatedModel(String uniqueId, CopyOnWriteArrayList<ItemStack> allItems, int itemsPerPage) {
         super(uniqueId);
-        this.allItems = allItems;
+        this.allItems = new CopyOnWriteArrayList<>(allItems);
         this.itemsPerPage = itemsPerPage;
     }
 

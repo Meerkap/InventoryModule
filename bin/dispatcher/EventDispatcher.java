@@ -14,6 +14,7 @@ import java.util.function.BiConsumer;
 public class EventDispatcher {
     private static final Map<Class<?>, List<BiConsumer<Object, InventoryView<?>>>> listeners = new ConcurrentHashMap<>();
 
+    @SuppressWarnings("unchecked")
     public static <E> void subscribe(Class<E> eventType, BiConsumer<E, InventoryView<?>> listener) {
         listeners.computeIfAbsent(eventType, k -> new CopyOnWriteArrayList<>())
                 .add((BiConsumer<Object, InventoryView<?>>) listener);

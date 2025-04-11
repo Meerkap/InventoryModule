@@ -31,11 +31,10 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
 
     @Override
     public void open() {
-
         if (scheduler.isShutdown()) {
             scheduler = SchedulerFactory.getScheduler();
         }
-
+        
         open = true;
         System.out.println("Abriendo vista de confirmación para " + playerName);
         stateContext.open();
