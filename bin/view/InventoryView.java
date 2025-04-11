@@ -91,6 +91,7 @@ public class InventoryView extends AbstractInventoryView<InventoryModel> {
             ViewRegistry.unregisterView(model.getUniqueId(), this);
             this.model = previous.getModel();
             this.currentPage = previous.getPage();
+            refresh();
             ViewRegistry.registerView(model.getUniqueId(), this);
             LOGGER.info("Volviendo al inventario anterior para " + playerName);
             open();

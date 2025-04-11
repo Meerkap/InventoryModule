@@ -10,6 +10,7 @@ import me.meerkap.rpgmarketplace.bin.utils.SchedulerFactory;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 /**
  * Vista para confirmación de acción, con timeout.
@@ -20,6 +21,7 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
     private ScheduledExecutorService scheduler = SchedulerFactory.getScheduler();
     private ScheduledFuture<?> timeoutTask;
     private boolean open = false;
+    private static final Logger LOGGER = Logger.getLogger(ConfirmationView.class.getName());
 
     public ConfirmationView(String playerName, ConfirmationModel model) {
         super(model);
@@ -34,14 +36,14 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
         if (scheduler.isShutdown()) {
             scheduler = SchedulerFactory.getScheduler();
         }
-        
+
         open = true;
-        System.out.println("Abriendo vista de confirmación para " + playerName);
+        LOGGER.info("Abriendo vista de confirmación para " + playerName);
         stateContext.open();
         refresh();
         timeoutTask = scheduler.schedule(() -> {
             if (open) {
-                System.out.println("Confirmación cancelada por timeout.");
+                LOGGER.info("Confirmación cancelada por timeout.");
                 close();
             }
         }, 30, TimeUnit.SECONDS);
@@ -67,7 +69,7 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
 
     @Override
     public void refresh() {
-        System.out.println("Confirmar: " + model.getMessage());
+        LOGGER.info("Confirmar: " + model.getMessage());
     }
 
     @Override

@@ -43,7 +43,9 @@ public class PaginatedModel extends InventoryModel {
     }
 
     public List<ItemStack> getPage(int page) {
-        return PageCalculator.getPage(allItems, page, itemsPerPage);
+        return pageCache.computeIfAbsent(page, p ->
+                PageCalculator.getPage(allItems, p, itemsPerPage)
+        );
     }
 
     @Override
