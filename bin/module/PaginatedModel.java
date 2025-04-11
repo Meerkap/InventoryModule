@@ -10,16 +10,17 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Representa un inventario paginado.
  */
 public class PaginatedModel extends InventoryModel {
-    private final List<ItemStack> allItems;
+    private final CopyOnWriteArrayList<ItemStack> allItems;
     private final int itemsPerPage;
     private transient Map<Integer, List<Object>> pageCache = new ConcurrentHashMap<>();
 
-    public PaginatedModel(String uniqueId, List<ItemStack> allItems, int itemsPerPage) {
+    public PaginatedModel(String uniqueId, CopyOnWriteArrayList<ItemStack> allItems, int itemsPerPage) {
         super(uniqueId);
         this.allItems = allItems;
         this.itemsPerPage = itemsPerPage;
@@ -39,10 +40,8 @@ public class PaginatedModel extends InventoryModel {
         return startIndex + localSlot;
     }
 
-    public List<Object> getPage(int page) {
-        return pageCache.computeIfAbsent(page, p ->
-                PageCalculator.getPage(allItems, p, itemsPerPage)
-        );
+    public List<ItemStack> getPage(int page) {
+        return PageCalculator.getPage(allItems, page, itemsPerPage);
     }
 
     @Override
@@ -69,7 +68,7 @@ public class PaginatedModel extends InventoryModel {
         return true;
     }
 
-    public Object getItem(int globalIndex) {
+    public ItemStack getItem(int globalIndex) {
         if (globalIndex < 0 || globalIndex >= allItems.size() || allItems.get(globalIndex) == null) {
             throw new ItemNotFoundException(globalIndex);
         }
@@ -77,8 +76,8 @@ public class PaginatedModel extends InventoryModel {
     }
 
     public String getItemName(int globalIndex) {
-        Object item = getItem(globalIndex);
-        return (item != null) ? item.toString() : "N/A";
+        ItemStack item = getItem(globalIndex);
+        return (item != null) ? item.getType().name() : "N/A"; // ✅
     }
 
     public double getPrice(int globalIndex) {

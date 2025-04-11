@@ -16,8 +16,8 @@ public class InventoryController {
      * @param model  Modelo de inventario.
      * @return Instancia de InventoryView.
      */
-    public static InventoryView<T> openInventory(String player, InventoryModel model) {
-        InventoryView<T> view = new InventoryView<T>(player, model);
+    public static InventoryView<?> openInventory(String player, InventoryModel model) {
+        InventoryView<?> view = new InventoryView<>(player, model);
         view.open();
         return view;
     }
@@ -28,7 +28,7 @@ public class InventoryController {
      * @param parentView Vista padre.
      * @param nestedView Vista anidada.
      */
-    public static void openNestedView(InventoryView<T> parentView, AbstractInventoryView<?> nestedView) {
+    public static void openNestedView(InventoryView<?> parentView, AbstractInventoryView<?> nestedView) {
         parentView.close();
         nestedView.open();
     }

@@ -2,6 +2,7 @@ package me.meerkap.rpgmarketplace.bin.view;
 
 import me.meerkap.rpgmarketplace.bin.components.HistoryComponent;
 import me.meerkap.rpgmarketplace.bin.controller.ViewRegistry;
+import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
 import me.meerkap.rpgmarketplace.bin.module.InventoryModel;
 import me.meerkap.rpgmarketplace.bin.states.InventoryStateContext;
 
@@ -48,25 +49,35 @@ public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
      * @param action Nombre de la acción.
      * @param slot   Slot local en la página.
      */
-    public void onAction(String action, int slot) {
-        if ("siguiente".equals(action)) {
-            currentPage++;
-            refresh();
-        } else if ("anterior".equals(action)) {
-            if (currentPage > 1) currentPage--;
-            refresh();
-        } else if ("comprar".equals(action)) {
-            historyComponent.registrarAccion(model, currentPage);
-            System.out.println("Iniciando compra, se cerrará esta vista.");
-            close();
-            // La apertura de la vista de confirmación se delega al controlador.
-        } else {
-            System.out.println("Acción no reconocida: " + action);
+    public void onAction(InventoryBuilderAction action, int slot) {
+        switch (action) {
+
+            case NEXT_PAGE:
+                currentPage++;
+                refresh();
+                break;
+            case PREV_PAGE:
+                if (currentPage > 1) currentPage--;
+                refresh();
+                break;
+            case BUY_ITEM:
+                historyComponent.registrarAccion(model, currentPage);
+                System.out.println("Iniciando compra, se cerrará esta vista.");
+                close();
+                // La apertura de la vista de confirmación se delega al controlador.
+                break;
+            case CANCEL:
+                stateContext.cancel();
+                close();
+                break;
+            default:
+                System.out.println("Acción no reconocida: " + action);
+                break;
         }
     }
 
     @Override
-    public void onAction(String action) {
+    public void onAction(InventoryBuilderAction action) {
         // Llamada sin slot, se delega a la versión con slot (por defecto, slot 0).
         onAction(action, 0);
     }

@@ -2,6 +2,7 @@ package me.meerkap.rpgmarketplace.bin;
 
 import me.meerkap.rpgmarketplace.bin.controller.InventoryController;
 import me.meerkap.rpgmarketplace.bin.controller.InventoryManager;
+import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
 import me.meerkap.rpgmarketplace.bin.factory.ConfirmationFactory;
 import me.meerkap.rpgmarketplace.bin.factory.InventoryFactory;
 import me.meerkap.rpgmarketplace.bin.module.ConfirmationModel;
@@ -39,7 +40,7 @@ public class MarketAppTestReady {
         int localSlot = 1;
         int globalIndex = shopModel.getGlobalIndex(page, localSlot);
         System.out.println("\nJugador1 ha pulsado 'comprar' sobre el slot local " + localSlot);
-        playerView.onAction("comprar", localSlot);
+        playerView.onAction(InventoryBuilderAction.BUY_ITEM, localSlot);
 
         // Se crea un modelo de confirmación que, al confirmar, elimina el ítem
         Runnable onConfirm = () -> {
@@ -61,7 +62,7 @@ public class MarketAppTestReady {
         InventoryController.openNestedView(playerView, confirmView);
 
         // Simulación: Jugador1 confirma la compra
-        confirmView.onAction("confirmar");
+        confirmView.onAction(InventoryBuilderAction.CONFIRM);
 
         // Se vuelve a la vista anterior del mercado
         playerView.goBack();

@@ -1,6 +1,7 @@
 package me.meerkap.rpgmarketplace.bin.view;
 
 import me.meerkap.rpgmarketplace.bin.controller.ViewRegistry;
+import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
 import me.meerkap.rpgmarketplace.bin.module.ConfirmationModel;
 import me.meerkap.rpgmarketplace.bin.states.ConfirmationState;
 import me.meerkap.rpgmarketplace.bin.states.InventoryStateContext;
@@ -16,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
     private final String playerName;
     private InventoryStateContext stateContext;
-    private final ScheduledExecutorService scheduler = SchedulerFactory.getScheduler();
+    private ScheduledExecutorService scheduler = SchedulerFactory.getScheduler();
     private ScheduledFuture<?> timeoutTask;
     private boolean open = false;
 
@@ -30,6 +31,11 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
 
     @Override
     public void open() {
+
+        if (scheduler.isShutdown()) {
+            scheduler = SchedulerFactory.getScheduler();
+        }
+
         open = true;
         System.out.println("Abriendo vista de confirmación para " + playerName);
         stateContext.open();
@@ -66,16 +72,20 @@ public class ConfirmationView extends AbstractInventoryView<ConfirmationModel> {
     }
 
     @Override
-    public void onAction(String action) {
-        if ("confirmar".equals(action)) {
-            stateContext.confirm();
-            model.getOnConfirm().run();
-            close();
-        } else if ("cancelar".equals(action)) {
-            stateContext.cancel();
-            close();
-        } else {
-            System.out.println("Acción no reconocida en confirmación: " + action);
+    public void onAction(InventoryBuilderAction action) {
+        switch (action) {
+            case CONFIRM:
+                stateContext.confirm();
+                model.getOnConfirm().run();
+                close();
+                break;
+            case CANCEL:
+                stateContext.cancel();
+                close();
+                break;
+            default:
+                System.out.println("Acción no reconocida en confirmación: " + action);
+                break;
         }
     }
 
