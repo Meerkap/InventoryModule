@@ -3,7 +3,9 @@ package me.meerkap.rpgmarketplace.bin.module;
 
 import me.meerkap.rpgmarketplace.bin.controller.ViewRegistry;
 import me.meerkap.rpgmarketplace.bin.view.InventoryView;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
@@ -11,7 +13,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * Modelo base para inventarios.
  */
 public abstract class InventoryModel implements Model {
-    private final Set<InventoryView<?>> linkedViews = new CopyOnWriteArraySet<>();
+    private final Set<InventoryView> linkedViews = new CopyOnWriteArraySet<>();
     protected final String uniqueId;
 
     public InventoryModel(String uniqueId) {
@@ -25,11 +27,13 @@ public abstract class InventoryModel implements Model {
         ViewRegistry.refreshAllViews(uniqueId);
     }
 
-    public void registerView(InventoryView<?> view) {
+    public void registerView(InventoryView view) {
         linkedViews.add(view);
     }
 
-    public void unregisterView(InventoryView<?> view) {
+    public abstract List<ItemStack> getPage(int page);
+
+    public void unregisterView(InventoryView view) {
         linkedViews.remove(view);
     }
 

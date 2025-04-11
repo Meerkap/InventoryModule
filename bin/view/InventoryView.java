@@ -5,7 +5,12 @@ import me.meerkap.rpgmarketplace.bin.controller.ViewRegistry;
 import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
 import me.meerkap.rpgmarketplace.bin.module.InventoryModel;
 import me.meerkap.rpgmarketplace.bin.states.InventoryStateContext;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 /**
@@ -28,14 +33,33 @@ public class InventoryView extends AbstractInventoryView<InventoryModel> {
 
     @Override
     public void open() {
-        LOGGER.info("Abriendo inventario para " + playerName);
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player == null) {
+            LOGGER.warning("No se encontró al jugador: " + playerName);
+            return;
+        }
+        // Crea un inventario de Bukkit (puedes ajustar el tamaño y el título)
+        Inventory bukkitInventory = Bukkit.createInventory(null, 54, "Inventario del Mercado");
+
+        // Rellenamos el inventario con los ítems correspondientes a la página actual
+        List<ItemStack> itemsEnPagina = model.getPage(currentPage);
+        for (int i = 0; i < itemsEnPagina.size(); i++) {
+            bukkitInventory.setItem(i, itemsEnPagina.get(i));
+        }
+
+        // Abre el inventario al jugador
+        player.openInventory(bukkitInventory);
+        LOGGER.info("Abriendo inventario para " + playerName + " en la página " + currentPage);
         stateContext.open();
         refresh();
     }
 
     @Override
     public void close() {
-        LOGGER.info("Cerrando inventario para " + playerName);
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player != null) {
+            player.closeInventory();
+        }
         stateContext.close();
         ViewRegistry.unregisterView(model.getUniqueId(), this);
     }
@@ -43,7 +67,18 @@ public class InventoryView extends AbstractInventoryView<InventoryModel> {
     @Override
     public void refresh() {
         LOGGER.info("Actualizando vista de " + playerName + " en la página " + currentPage);
-        // Aquí se integraría la lógica de renderizado real, por ejemplo, mostrando model.getPage(currentPage).
+        // Opcional: Actualizar el inventario visible al jugador.
+        Player player = Bukkit.getPlayerExact(playerName);
+        if (player != null && player.getOpenInventory().getTopInventory() != null) {
+            Inventory inv = player.getOpenInventory().getTopInventory();
+            // Vaciar el inventario
+            inv.clear();
+            // Rellenar nuevamente según la página actual
+            List<ItemStack> itemsEnPagina = model.getPage(currentPage);
+            for (int i = 0; i < itemsEnPagina.size(); i++) {
+                inv.setItem(i, itemsEnPagina.get(i));
+            }
+        }
     }
 
     /**
