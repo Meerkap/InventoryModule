@@ -25,8 +25,11 @@ public class InventoryManager {
     }
 
     public void registerModel(InventoryModel model) {
+
+        if (model instanceof PaginatedModel paginatedModel) {
+            SyncComponent.registerGlobalSync(paginatedModel);
+        }
         models.put(model.getUniqueId(), model);
-        SyncComponent.registerGlobalSync((PaginatedModel) model);
     }
 
     public InventoryModel getModel(String uniqueId) {

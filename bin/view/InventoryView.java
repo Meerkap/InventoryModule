@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 /**
  * Vista principal del inventario (por ejemplo, la tienda).
  */
-public class InventoryView<T> extends AbstractInventoryView<InventoryModel> {
+public class InventoryView extends AbstractInventoryView<InventoryModel> {
     private final String playerName;
     private int currentPage = 1;
     private final InventoryStateContext stateContext;

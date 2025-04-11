@@ -3,6 +3,8 @@ package me.meerkap.rpgmarketplace.bin.module;
 
 import me.meerkap.rpgmarketplace.bin.dispatcher.EventDispatcher;
 import me.meerkap.rpgmarketplace.bin.dispatcher.events.InventoryUpdateEvent;
+import me.meerkap.rpgmarketplace.bin.dispatcher.events.ItemRemovedEvent;
+import me.meerkap.rpgmarketplace.bin.exceptions.InvalidSlotException;
 import me.meerkap.rpgmarketplace.bin.exceptions.ItemNotFoundException;
 import me.meerkap.rpgmarketplace.bin.pagination.PageCalculator;
 import org.bukkit.inventory.ItemStack;
@@ -16,13 +18,13 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Representa un inventario paginado.
  */
 public class PaginatedModel extends InventoryModel {
-    private final List<ItemStack> allItems;
     private final int itemsPerPage;
-    private final transient Map<Integer, List<Object>> pageCache = new ConcurrentHashMap<>();
+    private final CopyOnWriteArrayList<ItemStack> allItems;
+    private final transient Map<Integer, List<ItemStack>> pageCache = new ConcurrentHashMap<>();
 
-    public PaginatedModel(String uniqueId, CopyOnWriteArrayList<ItemStack> allItems, int itemsPerPage) {
+    public PaginatedModel(String uniqueId, List<ItemStack> items, int itemsPerPage) {
         super(uniqueId);
-        this.allItems = new CopyOnWriteArrayList<>(allItems);
+        this.allItems = new CopyOnWriteArrayList<>(items);
         this.itemsPerPage = itemsPerPage;
     }
 
@@ -35,7 +37,7 @@ public class PaginatedModel extends InventoryModel {
             throw new IllegalArgumentException("Página o slot local inválido.");
         }
         if (startIndex + localSlot >= allItems.size()) {
-            throw new IndexOutOfBoundsException("Slot global excede el tamaño del inventario.");
+            throw new InvalidSlotException("Slot local fuera de rango: " + localSlot + ". Rango permitido: 0-" + (itemsPerPage - 1));
         }
         return startIndex + localSlot;
     }
@@ -65,6 +67,7 @@ public class PaginatedModel extends InventoryModel {
         allItems.set(globalIndex, null);
         pageCache.clear();
         notifyViews();
+        EventDispatcher.publish(new ItemRemovedEvent(this, globalIndex), null);
         return true;
     }
 
