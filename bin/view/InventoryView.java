@@ -3,8 +3,10 @@ package me.meerkap.rpgmarketplace.bin.view;
 import me.meerkap.rpgmarketplace.bin.components.HistoryComponent;
 import me.meerkap.rpgmarketplace.bin.controller.ViewRegistry;
 import me.meerkap.rpgmarketplace.bin.enums.InventoryBuilderAction;
+import me.meerkap.rpgmarketplace.bin.factory.InventoryHolderFactory;
 import me.meerkap.rpgmarketplace.bin.module.InventoryModel;
 import me.meerkap.rpgmarketplace.bin.states.InventoryStateContext;
+import me.meerkap.rpgmarketplace.bin.utils.CustomInventoryHolder;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -38,8 +40,11 @@ public class InventoryView extends AbstractInventoryView<InventoryModel> {
             LOGGER.warning("No se encontró al jugador: " + playerName);
             return;
         }
+
+        CustomInventoryHolder holder = InventoryHolderFactory.createPaginatedHolder(player.getUniqueId().toString(), currentPage);
+
         // Crea un inventario de Bukkit (puedes ajustar el tamaño y el título)
-        Inventory bukkitInventory = Bukkit.createInventory(null, 54, "Inventario del Mercado");
+        Inventory bukkitInventory = Bukkit.createInventory(holder, 54, "Inventario del Mercado");
 
         // Rellenamos el inventario con los ítems correspondientes a la página actual
         List<ItemStack> itemsEnPagina = model.getPage(currentPage);
